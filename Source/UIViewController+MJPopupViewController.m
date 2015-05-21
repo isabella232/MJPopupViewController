@@ -24,6 +24,7 @@
 @end
 
 static NSString *MJPopupViewDismissedKey = @"MJPopupViewDismissed";
+static NSString *MJPopupShouldDismissWithBackgroundTouch = @"MJPopupShouldDismissWithBackgroundTouch";
 
 ////////////////////////////////////////////////////////////////////////////
 #pragma mark -
@@ -139,8 +140,11 @@ static void * const keypath = (void*)&keypath;
     popupView.alpha = 0.0f;
     [overlayView addSubview:popupView];
     [sourceView addSubview:overlayView];
-    
-    [dismissButton addTarget:self action:@selector(dismissPopupViewControllerWithanimation:) forControlEvents:UIControlEventTouchUpInside];
+
+    if (self.shouldDismissWithBackgroundTouch) {
+        [dismissButton addTarget:self action:@selector(dismissPopupViewControllerWithanimation:) forControlEvents:UIControlEventTouchUpInside];
+    }
+
     switch (animationType) {
         case MJPopupViewAnimationSlideBottomTop:
         case MJPopupViewAnimationSlideBottomBottom:
@@ -370,6 +374,15 @@ static void * const keypath = (void*)&keypath;
 - (void(^)(void))dismissedCallback
 {
     return objc_getAssociatedObject(self, &MJPopupViewDismissedKey);
+}
+
+- (void)setShouldDismissWithBackgroundTouch:(BOOL)shouldDismissWithBackgroundTouch {
+    objc_setAssociatedObject(self, &MJPopupShouldDismissWithBackgroundTouch, @(shouldDismissWithBackgroundTouch), OBJC_ASSOCIATION_RETAIN);
+}
+
+- (BOOL)shouldDismissWithBackgroundTouch{
+    NSNumber *value = objc_getAssociatedObject(self, &MJPopupShouldDismissWithBackgroundTouch);
+    return [value boolValue];
 }
 
 @end
